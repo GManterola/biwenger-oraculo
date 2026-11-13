@@ -10,7 +10,7 @@ con una captura de pantalla.
 - [x] Recolector diario de datos públicos (`collector/collect.py`)
 - [x] Automatización diaria con GitHub Actions (`.github/workflows/collect.yml`)
 - [x] Prototipo web (`web/`): buscador de jugadores, ficha, Mi plantilla con alertas
-- [x] Publicar la web en GitHub Pages (`.github/workflows/pages.yml`): https://gmanterola.github.io/biwenger-oraculo/
+- [x] Web publicada en Vercel (se despliega sola con cada cambio en `main`, carpeta `web/`)
 - [ ] Cargar plantilla desde captura de pantalla
 - [ ] Modelo de probabilidad de jugar (con acierto publicado)
 - [ ] Seguimiento de saldos de rivales
