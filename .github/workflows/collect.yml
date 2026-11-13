@@ -22,14 +22,16 @@ jobs:
           python-version: "3.13"
       - name: Descargar datos públicos de Biwenger
         run: |
-          for score in 1 2 3 5; do
+          for score in 1 2 3 5 6 7 8; do
             python collector/collect.py --competition la-liga --score "$score"
           done
+      - name: Generar datos de la web
+        run: python collector/build_site_data.py --competition la-liga
       - name: Guardar en el repositorio
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add data/raw
+          git add data/raw web/data
           if git diff --cached --quiet; then
             echo "Sin cambios"
           else

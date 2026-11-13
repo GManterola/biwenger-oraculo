@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biwenger Oráculo</title>
+  <meta name="description" content="Herramienta no oficial para managers de Biwenger: estado, forma, precios y alertas de tu plantilla.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">◎</span>
+        <div>
+          <h1>Biwenger Oráculo</h1>
+          <p class="sub" id="meta">Cargando datos…</p>
+        </div>
+      </div>
+      <label class="score-pick">
+        <span>Sistema de puntuación</span>
+        <select id="score"></select>
+      </label>
+    </div>
+    <nav class="wrap tabs" role="tablist">
+      <button role="tab" data-tab="players" aria-selected="true">Jugadores</button>
+      <button role="tab" data-tab="squad" aria-selected="false">Mi plantilla <span id="squad-count" class="pill">0</span></button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section id="tab-players">
+      <div class="filters">
+        <input id="q" type="search" placeholder="Buscar jugador o equipo…" autocomplete="off">
+        <div class="chips" id="pos-chips">
+          <button data-pos="" class="on">Todos</button>
+          <button data-pos="POR">POR</button>
+          <button data-pos="DEF">DEF</button>
+          <button data-pos="MED">MED</button>
+          <button data-pos="DEL">DEL</button>
+        </div>
+        <select id="team"><option value="">Todos los equipos</option></select>
+        <select id="status">
+          <option value="">Cualquier estado</option>
+          <option value="ok">Disponible</option>
+          <option value="doubt">Duda</option>
+          <option value="injured">Lesionado</option>
+          <option value="warned">Apercibido</option>
+          <option value="sanctioned">Sancionado</option>
+        </select>
+        <select id="sort">
+          <option value="pts">Más puntos</option>
+          <option value="avg">Mejor media</option>
+          <option value="form">Mejor forma (5 últ.)</option>
+          <option value="value">Puntos por millón</option>
+          <option value="inc">Más sube hoy</option>
+          <option value="dec">Más baja hoy</option>
+          <option value="price">Más caro</option>
+          <option value="cheap">Más barato</option>
+        </select>
+      </div>
+      <div id="players-list" class="list"></div>
+      <button id="more" class="more" hidden>Mostrar más</button>
+    </section>
+
+    <section id="tab-squad" hidden>
+      <div class="squad-add">
+        <input id="squad-q" type="search" placeholder="Añadir jugador a tu plantilla…" autocomplete="off">
+        <div id="squad-suggest" class="suggest" hidden></div>
+      </div>
+      <div id="squad-summary" class="summary"></div>
+      <div id="squad-alerts"></div>
+      <div id="squad-list" class="list"></div>
+      <p class="hint">Tu plantilla se guarda solo en este navegador. No conectamos con tu cuenta de Biwenger.</p>
+    </section>
+  </main>
+
+  <dialog id="player-dialog">
+    <div id="player-detail"></div>
+  </dialog>
+
+  <footer class="wrap foot">
+    Herramienta no oficial, sin relación con Biwenger. Datos públicos de la competición.
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -9,11 +9,23 @@ con una captura de pantalla.
 
 - [x] Recolector diario de datos públicos (`collector/collect.py`)
 - [x] Automatización diaria con GitHub Actions (`.github/workflows/collect.yml`)
-- [ ] Prototipo web: buscador de jugadores y carga de plantilla
+- [x] Prototipo web (`web/`): buscador de jugadores, ficha, Mi plantilla con alertas
+- [ ] Publicar la web
+- [ ] Cargar plantilla desde captura de pantalla
 - [ ] Modelo de probabilidad de jugar (con acierto publicado)
 - [ ] Seguimiento de saldos de rivales
 - [ ] Oráculo
 - [ ] Cuenta de X
+
+## Web
+
+Web estática en `web/` (HTML, CSS y JS sin dependencias). Lee
+`web/data/la-liga.json`, que genera `collector/build_site_data.py` a partir de
+`data/raw`. Para probarla en local:
+
+```bash
+python collector/build_site_data.py && python -m http.server -d web 8000
+```
 
 ## Datos
 
