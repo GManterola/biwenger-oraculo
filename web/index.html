@@ -1,87 +1,89 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Biwenger Oráculo</title>
-  <meta name="description" content="Herramienta no oficial para managers de Biwenger: estado, forma, precios y alertas de tu plantilla.">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bifantasy Oráculo: % de jugar, puja ideal y analizador de plantilla para Biwenger</title>
+<meta name="description" content="Analiza tu plantilla de Biwenger: probabilidad de jugar, probabilidad de buen partido, puja ideal, chollos, subidas y bajadas de precio y bajas de cada jornada. Gratis y sin registrarte.">
+<link rel="canonical" href="https://bifantasy-oraculo.vercel.app/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bifantasy Oráculo">
+<meta property="og:title" content="Bifantasy Oráculo: % de jugar, puja ideal y analizador de plantilla para Biwenger">
+<meta property="og:description" content="Analiza tu plantilla de Biwenger: probabilidad de jugar, probabilidad de buen partido, puja ideal, chollos, subidas y bajadas de precio y bajas de cada jornada. Gratis y sin registrarte.">
+<meta property="og:url" content="https://bifantasy-oraculo.vercel.app/">
+<meta property="og:image" content="https://bifantasy-oraculo.vercel.app/og.png">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1f6fd1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/styles.css?v=20261113">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Bifantasy Oráculo", "url": "https://bifantasy-oraculo.vercel.app/", "inLanguage": "es"}</script>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script src="/common.js?v=20261113" defer></script>
+
 </head>
-<body>
-  <header class="top">
-    <div class="wrap top-inner">
-      <div class="brand">
-        <span class="logo" aria-hidden="true">◎</span>
-        <div>
-          <h1>Biwenger Oráculo</h1>
-          <p class="sub" id="meta">Cargando datos…</p>
-        </div>
-      </div>
-      <label class="score-pick">
-        <span>Sistema de puntuación</span>
-        <select id="score"></select>
-      </label>
+<body data-page="home">
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="brand" href="/"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span><strong>Bifantasy</strong> Oráculo</span></a>
+    <label class="score-pick" title="Elige el sistema de puntuación de tu liga">
+      <span>Puntuación</span>
+      <select id="score-select" aria-label="Sistema de puntuación"><option value="1">Diario AS</option><option value="7">Feeberse Score</option><option value="8">Media AS y Feeberse</option><option value="2">SofaScore</option><option value="5">Media AS y SofaScore</option><option value="3">Estadísticas</option><option value="6">Biwenger Social</option></select>
+    </label>
+  </div>
+  <nav class="wrap nav" aria-label="Principal"><a href="/" aria-current="page">Inicio</a><a href="/plantilla/">Mi plantilla</a><a href="/jugadores/">Jugadores</a><a href="/mercado/">Mercado</a><a href="/bajas/">Bajas</a><a href="/puja/">Puja ideal</a><a href="/consultorio/">Consultorio</a><a href="/rivales/">Rivales</a></nav>
+</header>
+<main id="main" class="wrap">
+
+<section class="hero">
+  <p class="eyebrow">Para managers de Biwenger · Gratis · Sin registrarte</p>
+  <h1>Decide tu once y tus fichajes con datos, no con corazonadas</h1>
+  <p class="lead">Probabilidad de jugar, probabilidad de buen partido, puja ideal y alertas de tu plantilla.
+  Todo actualizado cada mañana y en el sistema de puntuación de tu liga.</p>
+  <div class="cta"><a class="btn primary" href="/plantilla/">Analizar mi plantilla</a>
+  <a class="btn" href="/puja/">Calcular una puja</a></div>
+  <p class="hint">No pedimos tu cuenta de Biwenger: añades tus jugadores y se guardan solo en tu navegador.</p>
+</section>
+
+<section class="grid4">
+  <div class="card"><h2>Más suben hoy</h2><ul class='mini'><li><a href="/jugador/aubameyang/">Aubameyang</a><span class="muted">Deportivo</span><span class="r up">▲ +190 k</span></li><li><a href="/jugador/fermin-lopez/">Fermín</a><span class="muted">Barcelona</span><span class="r up">▲ +190 k</span></li><li><a href="/jugador/yan-diomande/">Diomande</a><span class="muted">Real Madrid</span><span class="r up">▲ +190 k</span></li><li><a href="/jugador/fede-valverde/">Valverde</a><span class="muted">Real Madrid</span><span class="r up">▲ +160 k</span></li><li><a href="/jugador/marc-casado/">Marc Casadó</a><span class="muted">Deportivo</span><span class="r up">▲ +160 k</span></li></ul><a class="more-link" href="/mercado/">Ver mercado →</a></div>
+  <div class="card"><h2>Más bajan hoy</h2><ul class='mini'><li><a href="/jugador/barrenetxea/">Barrenetxea</a><span class="muted">Real Sociedad</span><span class="r down">▼ −220 k</span></li><li><a href="/jugador/rodri-hernandez/">Rodri</a><span class="muted">Barcelona</span><span class="r down">▼ −190 k</span></li><li><a href="/jugador/jonathan-david/">Jonathan David</a><span class="muted">Atlético</span><span class="r down">▼ −160 k</span></li><li><a href="/jugador/sergio-camello/">Camello</a><span class="muted">Rayo Vallecano</span><span class="r down">▼ −160 k</span></li><li><a href="/jugador/alex-freeman/">Freeman</a><span class="muted">Villarreal</span><span class="r down">▼ −150 k</span></li></ul><a class="more-link" href="/mercado/#bajadas">Ver bajadas →</a></div>
+  <div class="card"><h2>Bajas y dudas</h2><ul class='mini'><li><a href="/jugador/alfonso-gonzales/">Alfon González</a><span class="muted">Sevilla</span><span class="st st-injured"><span class="dot" aria-hidden="true"></span>Lesionado</span></li><li><a href="/jugador/ilaix-moriba/">Ilaix Moriba</a><span class="muted">Celta</span><span class="st st-doubt"><span class="dot" aria-hidden="true"></span>Duda</span></li><li><a href="/jugador/a-fernandez/">Aitor Fernández</a><span class="muted">Osasuna</span><span class="st st-injured"><span class="dot" aria-hidden="true"></span>Lesionado</span></li><li><a href="/jugador/morante/">Morante</a><span class="muted">Betis</span><span class="st st-doubt"><span class="dot" aria-hidden="true"></span>Duda</span></li><li><a href="/jugador/umar-sadiq/">Sadiq</a><span class="muted">Valencia</span><span class="st st-doubt"><span class="dot" aria-hidden="true"></span>Duda</span></li></ul><a class="more-link" href="/bajas/">Ver todas →</a></div>
+  <div class="card"><h2>Chollos</h2><ul class='mini'><li><a href="/jugador/iker-luque/">Iker Luque</a><span class="muted">Racing</span><span class="r">1,18 M</span></li><li><a href="/jugador/g-tsitaishvili/">Tsitaishvili</a><span class="muted">Rayo Vallecano</span><span class="r">1,32 M</span></li><li><a href="/jugador/mangala-2/">Mangala</a><span class="muted">Getafe</span><span class="r">1,27 M</span></li><li><a href="/jugador/ejuke/">Ejuke</a><span class="muted">Sevilla</span><span class="r">2,24 M</span></li><li><a href="/jugador/isaac-romero/">Isaac Romero</a><span class="muted">Sevilla</span><span class="r">1,92 M</span></li></ul><a class="more-link" href="/mercado/#chollos">Ver chollos →</a></div>
+</section>
+
+<section class="features">
+  <h2>Qué puedes hacer</h2>
+  <div class="feat-grid">
+    <a class="feat" href="/plantilla/"><h3>Analizador de plantilla</h3><p>% de jugar y % de buen partido de cada jugador, alertas y el once ideal para Jornada 13.</p></a>
+    <a class="feat" href="/puja/"><h3>Puja ideal</h3><p>Elige un jugador y te decimos cuánto pujar según su valor, su tendencia y tu liga.</p></a>
+    <a class="feat" href="/consultorio/"><h3>Consultorio</h3><p>¿A o B? ¿Qué delantero fichar por menos de 5 M? Respuestas al momento y con datos.</p></a>
+    <a class="feat" href="/rivales/"><h3>Saldos de rivales</h3><p>Lleva el dinero de cada rival y descubre quién puede pagar tu cláusula.</p></a>
+  </div>
+</section>
+
+</main>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <div>
+      <div class="brand small"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span><strong>Bifantasy</strong> Oráculo</span></div>
+      <p>Herramienta independiente y no oficial para managers de fantasy. No está afiliada,
+      patrocinada ni respaldada por Biwenger ni por LaLiga. Las marcas citadas pertenecen a sus titulares.</p>
+      <p>Datos actualizados el 13 de noviembre. Las probabilidades son estimaciones, no garantías.</p>
     </div>
-    <nav class="wrap tabs" role="tablist">
-      <button role="tab" data-tab="players" aria-selected="true">Jugadores</button>
-      <button role="tab" data-tab="squad" aria-selected="false">Mi plantilla <span id="squad-count" class="pill">0</span></button>
+    <nav aria-label="Pie">
+      <a href="/metodologia/">Cómo calculamos</a>
+      <a href="/liga/">Liga Bifantasy</a>
+      <a href="/equipos/">Equipos</a>
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacidad/">Privacidad</a>
     </nav>
-  </header>
-
-  <main class="wrap">
-    <section id="tab-players">
-      <div class="filters">
-        <input id="q" type="search" placeholder="Buscar jugador o equipo…" autocomplete="off">
-        <div class="chips" id="pos-chips">
-          <button data-pos="" class="on">Todos</button>
-          <button data-pos="POR">POR</button>
-          <button data-pos="DEF">DEF</button>
-          <button data-pos="MED">MED</button>
-          <button data-pos="DEL">DEL</button>
-        </div>
-        <select id="team"><option value="">Todos los equipos</option></select>
-        <select id="status">
-          <option value="">Cualquier estado</option>
-          <option value="ok">Disponible</option>
-          <option value="doubt">Duda</option>
-          <option value="injured">Lesionado</option>
-          <option value="warned">Apercibido</option>
-          <option value="sanctioned">Sancionado</option>
-        </select>
-        <select id="sort">
-          <option value="pts">Más puntos</option>
-          <option value="avg">Mejor media</option>
-          <option value="form">Mejor forma (5 últ.)</option>
-          <option value="value">Puntos por millón</option>
-          <option value="inc">Más sube hoy</option>
-          <option value="dec">Más baja hoy</option>
-          <option value="price">Más caro</option>
-          <option value="cheap">Más barato</option>
-        </select>
-      </div>
-      <div id="players-list" class="list"></div>
-      <button id="more" class="more" hidden>Mostrar más</button>
-    </section>
-
-    <section id="tab-squad" hidden>
-      <div class="squad-add">
-        <input id="squad-q" type="search" placeholder="Añadir jugador a tu plantilla…" autocomplete="off">
-        <div id="squad-suggest" class="suggest" hidden></div>
-      </div>
-      <div id="squad-summary" class="summary"></div>
-      <div id="squad-alerts"></div>
-      <div id="squad-list" class="list"></div>
-      <p class="hint">Tu plantilla se guarda solo en este navegador. No conectamos con tu cuenta de Biwenger.</p>
-    </section>
-  </main>
-
-  <dialog id="player-dialog">
-    <div id="player-detail"></div>
-  </dialog>
-
-  <footer class="wrap foot">
-    Herramienta no oficial, sin relación con Biwenger. Datos públicos de la competición.
-  </footer>
-  <script src="app.js"></script>
+  </div>
+</footer>
 </body>
 </html>

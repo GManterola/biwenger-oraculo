@@ -1,30 +1,36 @@
-# Biwenger Oráculo
+# Bifantasy Oráculo
 
-Herramienta no oficial para managers de Biwenger: probabilidad de jugar,
+Herramienta independiente y no oficial para managers de fantasy (compatible con Biwenger): probabilidad de jugar,
 análisis de plantilla, seguimiento de rivales y un oráculo que responde dudas
 con datos. **No conecta cuentas de Biwenger**: la plantilla se carga a mano o
 con una captura de pantalla.
 
 ## Estado
 
-- [x] Recolector diario de datos públicos (`collector/collect.py`)
-- [x] Automatización diaria con GitHub Actions (`.github/workflows/collect.yml`)
-- [x] Prototipo web (`web/`): buscador de jugadores, ficha, Mi plantilla con alertas
-- [x] Web publicada en Vercel (se despliega sola con cada cambio en `main`, carpeta `web/`)
+- [x] Recolector diario de datos públicos (`collector/collect.py`) con los 7 sistemas de puntuación
+- [x] Automatización diaria con GitHub Actions (`.github/workflows/collect.yml`): descarga, genera la web y la sube; Vercel la publica
+- [x] Modelo v0 (`site/model.py`): % de jugar, % de buen partido, puntos esperados e índice de valor
+- [x] Web multipágina (`site/build.py` → `web/`): portada, jugadores, mercado, bajas, ficha por jugador y por equipo
+- [x] Analizador de plantilla con alertas y once ideal (`/plantilla/`)
+- [x] Puja ideal (`/puja/`), consultorio automático (`/consultorio/`), saldos de rivales (`/rivales/`)
+- [x] SEO: títulos y descripciones, sitemap, robots, datos estructurados, imagen para redes
+- [ ] Liga Bifantasy: poner el código en `LEAGUE` de `site/build.py`
+- [ ] Calibrar el modelo con histórico y publicar su acierto
 - [ ] Cargar plantilla desde captura de pantalla
-- [ ] Modelo de probabilidad de jugar (con acierto publicado)
-- [ ] Seguimiento de saldos de rivales
-- [ ] Oráculo
+- [ ] Oráculo en lenguaje natural
+- [ ] Otros juegos (LaLiga Fantasy/Mister, Futmondo, Comunio…) y competiciones
 - [ ] Cuenta de X
 
 ## Web
 
-Web estática en `web/` (HTML, CSS y JS sin dependencias). Lee
-`web/data/la-liga.json`, que genera `collector/build_site_data.py` a partir de
-`data/raw`. Para probarla en local:
+`site/build.py` genera la web estática completa en `web/` (no se edita a mano):
+páginas HTML, `web/data/la-liga.json` para las herramientas, `sitemap.xml` y
+`robots.txt`. Estilos, JavaScript e iconos están en `site/static/`.
+La URL pública se configura con `SITE_URL` (por defecto
+`https://bifantasy-oraculo.vercel.app`).
 
 ```bash
-python collector/build_site_data.py && python -m http.server -d web 8000
+python site/build.py && python -m http.server -d web 8000
 ```
 
 ## Datos

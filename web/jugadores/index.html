@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jugadores de Biwenger: precio, % de jugar y puntos | Bifantasy Oráculo</title>
+<meta name="description" content="Todos los jugadores de LaLiga en Biwenger con precio, variación diaria, estado, probabilidad de jugar, puntos y forma. Filtra por posición, equipo y precio.">
+<link rel="canonical" href="https://bifantasy-oraculo.vercel.app/jugadores/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bifantasy Oráculo">
+<meta property="og:title" content="Jugadores de Biwenger: precio, % de jugar y puntos">
+<meta property="og:description" content="Todos los jugadores de LaLiga en Biwenger con precio, variación diaria, estado, probabilidad de jugar, puntos y forma. Filtra por posición, equipo y precio.">
+<meta property="og:url" content="https://bifantasy-oraculo.vercel.app/jugadores/">
+<meta property="og:image" content="https://bifantasy-oraculo.vercel.app/og.png">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1f6fd1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/styles.css?v=20261113">
+
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script src="/common.js?v=20261113" defer></script>
+<script src="/players.js?v=20261113" defer></script>
+</head>
+<body data-page="players">
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="brand" href="/"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span><strong>Bifantasy</strong> Oráculo</span></a>
+    <label class="score-pick" title="Elige el sistema de puntuación de tu liga">
+      <span>Puntuación</span>
+      <select id="score-select" aria-label="Sistema de puntuación"><option value="1">Diario AS</option><option value="7">Feeberse Score</option><option value="8">Media AS y Feeberse</option><option value="2">SofaScore</option><option value="5">Media AS y SofaScore</option><option value="3">Estadísticas</option><option value="6">Biwenger Social</option></select>
+    </label>
+  </div>
+  <nav class="wrap nav" aria-label="Principal"><a href="/">Inicio</a><a href="/plantilla/">Mi plantilla</a><a href="/jugadores/" aria-current="page">Jugadores</a><a href="/mercado/">Mercado</a><a href="/bajas/">Bajas</a><a href="/puja/">Puja ideal</a><a href="/consultorio/">Consultorio</a><a href="/rivales/">Rivales</a></nav>
+</header>
+<main id="main" class="wrap">
+
+<h1>Jugadores</h1>
+<p class="lead small">Busca, filtra y ordena los 551 jugadores de Primera División por puntos, probabilidad de jugar, forma o valor.</p>
+<div class="filters">
+  <input id="q" type="search" placeholder="Buscar jugador o equipo…" autocomplete="off" aria-label="Buscar">
+  <div class="chips" id="pos-chips" role="group" aria-label="Posición">
+    <button data-pos="" class="on">Todos</button><button data-pos="POR">POR</button><button data-pos="DEF">DEF</button><button data-pos="MED">MED</button><button data-pos="DEL">DEL</button>
+  </div>
+  <select id="team" aria-label="Equipo"><option value="">Todos los equipos</option><option value="91">Alavés</option><option value="1">Athletic</option><option value="2">Atlético</option><option value="3">Barcelona</option><option value="87">Betis</option><option value="5">Celta</option><option value="6">Deportivo</option><option value="75">Elche</option><option value="7">Espanyol</option><option value="8">Getafe</option><option value="10">Levante</option><option value="65">Málaga</option><option value="93">Osasuna</option><option value="812">Racing</option><option value="70">Rayo Vallecano</option><option value="15">Real Madrid</option><option value="13">Real Sociedad</option><option value="17">Sevilla</option><option value="18">Valencia</option><option value="19">Villarreal</option></select>
+  <select id="status" aria-label="Estado"><option value="">Cualquier estado</option><option value="ok">Disponible</option><option value="doubt">Duda</option><option value="injured">Lesionado</option><option value="warned">Apercibido</option><option value="sanctioned">Sancionado</option></select>
+  <select id="sort" aria-label="Ordenar"><option value="pts">Más puntos</option><option value="xp">Más puntos esperados</option><option value="pplay">Más % de jugar</option><option value="avg">Mejor media</option><option value="form">Mejor forma</option><option value="value">Mejor valor</option><option value="inc">Más sube hoy</option><option value="dec">Más baja hoy</option><option value="price">Más caro</option><option value="cheap">Más barato</option></select>
+  <label class="maxp">Precio máx. <input id="maxp" type="text" min="0" step="0.5" inputmode="decimal" placeholder="M €"></label>
+</div>
+<div id="players-list" class="list"><p class="empty">Cargando jugadores…</p></div>
+<button id="more" class="btn more" hidden>Mostrar más</button>
+
+</main>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <div>
+      <div class="brand small"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span><strong>Bifantasy</strong> Oráculo</span></div>
+      <p>Herramienta independiente y no oficial para managers de fantasy. No está afiliada,
+      patrocinada ni respaldada por Biwenger ni por LaLiga. Las marcas citadas pertenecen a sus titulares.</p>
+      <p>Datos actualizados el 13 de noviembre. Las probabilidades son estimaciones, no garantías.</p>
+    </div>
+    <nav aria-label="Pie">
+      <a href="/metodologia/">Cómo calculamos</a>
+      <a href="/liga/">Liga Bifantasy</a>
+      <a href="/equipos/">Equipos</a>
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacidad/">Privacidad</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>

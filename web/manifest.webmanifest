@@ -1,0 +1,15 @@
+{
+  "name": "Bifantasy Oráculo",
+  "short_name": "Bifantasy",
+  "description": "% de jugar, puja ideal y analizador de plantilla para managers de fantasy.",
+  "start_url": "/plantilla/",
+  "display": "standalone",
+  "background_color": "#f5f6f8",
+  "theme_color": "#1f6fd1",
+  "lang": "es",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

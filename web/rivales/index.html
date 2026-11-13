@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de saldos de rivales para Biwenger | Bifantasy Oráculo</title>
+<meta name="description" content="Controla el saldo de cada rival de tu liga de Biwenger: compras, ventas, cláusulas y premios por jornada. Descubre quién puede pagar tu cláusula.">
+<link rel="canonical" href="https://bifantasy-oraculo.vercel.app/rivales/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bifantasy Oráculo">
+<meta property="og:title" content="Calculadora de saldos de rivales para Biwenger">
+<meta property="og:description" content="Controla el saldo de cada rival de tu liga de Biwenger: compras, ventas, cláusulas y premios por jornada. Descubre quién puede pagar tu cláusula.">
+<meta property="og:url" content="https://bifantasy-oraculo.vercel.app/rivales/">
+<meta property="og:image" content="https://bifantasy-oraculo.vercel.app/og.png">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1f6fd1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/styles.css?v=20261113">
+
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script src="/common.js?v=20261113" defer></script>
+<script src="/rivals.js?v=20261113" defer></script>
+</head>
+<body data-page="rivals">
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="brand" href="/"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span><strong>Bifantasy</strong> Oráculo</span></a>
+    <label class="score-pick" title="Elige el sistema de puntuación de tu liga">
+      <span>Puntuación</span>
+      <select id="score-select" aria-label="Sistema de puntuación"><option value="1">Diario AS</option><option value="7">Feeberse Score</option><option value="8">Media AS y Feeberse</option><option value="2">SofaScore</option><option value="5">Media AS y SofaScore</option><option value="3">Estadísticas</option><option value="6">Biwenger Social</option></select>
+    </label>
+  </div>
+  <nav class="wrap nav" aria-label="Principal"><a href="/">Inicio</a><a href="/plantilla/">Mi plantilla</a><a href="/jugadores/">Jugadores</a><a href="/mercado/">Mercado</a><a href="/bajas/">Bajas</a><a href="/puja/">Puja ideal</a><a href="/consultorio/">Consultorio</a><a href="/rivales/" aria-current="page">Rivales</a></nav>
+</header>
+<main id="main" class="wrap">
+
+<h1>Saldos de rivales</h1>
+<p class="lead small">Lleva el dinero de cada rival de tu liga y descubre quién puede pagar tu cláusula o pujar fuerte por un jugador.</p>
+<div class="card">
+  <h2>¿Quién puede pagar…?</h2>
+  <div class="form-grid">
+    <label>Importe (M €) <input id="r-amount" type="text" min="0" step="0.1" inputmode="decimal" placeholder="Ej. la cláusula de tu delantero"></label>
+    <label>Margen de deuda permitido en tu liga (M €) <input id="r-debt" type="text" min="0" step="0.5" value="0" inputmode="decimal"></label>
+  </div>
+  <div id="r-who"></div>
+</div>
+<div class="row-actions"><input id="r-new" type="text" placeholder="Nombre del rival" aria-label="Nombre del rival"><input id="r-new-saldo" type="text" step="0.1" placeholder="Saldo actual (M €)" inputmode="decimal" aria-label="Saldo actual"><button class="btn primary" id="r-add">Añadir rival</button></div>
+<div id="r-list"></div>
+<details class="paste"><summary>Copia de seguridad</summary>
+  <p class="hint">Tus datos se guardan solo en este navegador. Exporta una copia para pasarla a otro dispositivo.</p>
+  <button class="btn" id="r-export">Exportar</button> <button class="btn" id="r-import">Importar</button>
+  <textarea id="r-io" rows="4" hidden></textarea>
+</details>
+
+</main>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <div>
+      <div class="brand small"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span><strong>Bifantasy</strong> Oráculo</span></div>
+      <p>Herramienta independiente y no oficial para managers de fantasy. No está afiliada,
+      patrocinada ni respaldada por Biwenger ni por LaLiga. Las marcas citadas pertenecen a sus titulares.</p>
+      <p>Datos actualizados el 13 de noviembre. Las probabilidades son estimaciones, no garantías.</p>
+    </div>
+    <nav aria-label="Pie">
+      <a href="/metodologia/">Cómo calculamos</a>
+      <a href="/liga/">Liga Bifantasy</a>
+      <a href="/equipos/">Equipos</a>
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacidad/">Privacidad</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>

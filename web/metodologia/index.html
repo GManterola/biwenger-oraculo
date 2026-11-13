@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo calculamos el % de jugar y la puja ideal | Bifantasy Oráculo</title>
+<meta name="description" content="Metodología de Bifantasy Oráculo: cómo estimamos la probabilidad de jugar, de buen partido, los puntos esperados y la puja ideal.">
+<link rel="canonical" href="https://bifantasy-oraculo.vercel.app/metodologia/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bifantasy Oráculo">
+<meta property="og:title" content="Cómo calculamos el % de jugar y la puja ideal">
+<meta property="og:description" content="Metodología de Bifantasy Oráculo: cómo estimamos la probabilidad de jugar, de buen partido, los puntos esperados y la puja ideal.">
+<meta property="og:url" content="https://bifantasy-oraculo.vercel.app/metodologia/">
+<meta property="og:image" content="https://bifantasy-oraculo.vercel.app/og.png">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1f6fd1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/styles.css?v=20261113">
+
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script src="/common.js?v=20261113" defer></script>
+
+</head>
+<body data-page="">
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="brand" href="/"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span><strong>Bifantasy</strong> Oráculo</span></a>
+    <label class="score-pick" title="Elige el sistema de puntuación de tu liga">
+      <span>Puntuación</span>
+      <select id="score-select" aria-label="Sistema de puntuación"><option value="1">Diario AS</option><option value="7">Feeberse Score</option><option value="8">Media AS y Feeberse</option><option value="2">SofaScore</option><option value="5">Media AS y SofaScore</option><option value="3">Estadísticas</option><option value="6">Biwenger Social</option></select>
+    </label>
+  </div>
+  <nav class="wrap nav" aria-label="Principal"><a href="/">Inicio</a><a href="/plantilla/">Mi plantilla</a><a href="/jugadores/">Jugadores</a><a href="/mercado/">Mercado</a><a href="/bajas/">Bajas</a><a href="/puja/">Puja ideal</a><a href="/consultorio/">Consultorio</a><a href="/rivales/">Rivales</a></nav>
+</header>
+<main id="main" class="wrap">
+
+<h1>Cómo calculamos</h1>
+<p class="lead small">Queremos que sepas de dónde sale cada número. Este es el modelo v0: reglas sencillas y transparentes. A medida que acumulemos jornadas lo sustituiremos por un modelo calibrado y publicaremos su acierto.</p>
+<h2>Probabilidad de jugar</h2>
+<ul>
+<li>Partimos de los partidos jugados esta temporada sobre los de su equipo.</li>
+<li>Lo combinamos con las 5 últimas jornadas, dando más peso a las más recientes. Las jornadas en que estaba lesionado o sancionado no cuentan.</li>
+<li>Ajustamos por su estado: una duda se queda en la mitad, un lesionado o sancionado casi a cero. Si vuelve de una lesión, restamos un 20 %.</li>
+</ul>
+<h2>Buen partido</h2>
+<p>Probabilidad de jugar multiplicada por la frecuencia con la que supera el umbral de buen partido cuando juega, suavizada con su media de la temporada. El umbral depende del sistema de puntuación:</p>
+<div class="table-wrap"><table class="pts"><thead><tr><th>Sistema</th><th>Buen partido</th></tr></thead><tbody><tr><td>Diario AS</td><td>6 puntos</td></tr><tr><td>Feeberse Score</td><td>7 puntos</td></tr><tr><td>Media AS y Feeberse</td><td>7 puntos</td></tr><tr><td>SofaScore</td><td>7 puntos</td></tr><tr><td>Media AS y SofaScore</td><td>7 puntos</td></tr><tr><td>Estadísticas</td><td>6 puntos</td></tr><tr><td>Biwenger Social</td><td>5 puntos</td></tr></tbody></table></div>
+<h2>Puntos esperados</h2>
+<p>Probabilidad de jugar × la media por partido (mitad temporada, mitad últimas jornadas) × un pequeño ajuste por jugar en casa (+8 %) o fuera (−6 %).</p>
+<h2 id="puja">Puja ideal</h2>
+<p>Sobre el precio de hoy sumamos un porcentaje que crece si el jugador está subiendo, si da más puntos esperados por millón que la mediana de su posición, si hay muchos managers en tu liga y cuanto más lo necesites. Baja si es duda y desaconsejamos pujar si está lesionado o sancionado.</p>
+<h2>Datos</h2>
+<p>Usamos los datos públicos de la competición, actualizados cada mañana. No accedemos a cuentas ni ligas privadas.</p>
+
+</main>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <div>
+      <div class="brand small"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v5M16 25v5M2 16h5M25 16h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span><strong>Bifantasy</strong> Oráculo</span></div>
+      <p>Herramienta independiente y no oficial para managers de fantasy. No está afiliada,
+      patrocinada ni respaldada por Biwenger ni por LaLiga. Las marcas citadas pertenecen a sus titulares.</p>
+      <p>Datos actualizados el 13 de noviembre. Las probabilidades son estimaciones, no garantías.</p>
+    </div>
+    <nav aria-label="Pie">
+      <a href="/metodologia/">Cómo calculamos</a>
+      <a href="/liga/">Liga Bifantasy</a>
+      <a href="/equipos/">Equipos</a>
+      <a href="/aviso-legal/">Aviso legal</a>
+      <a href="/privacidad/">Privacidad</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
