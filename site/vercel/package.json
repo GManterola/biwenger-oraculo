@@ -1,0 +1,9 @@
+{
+  "name": "bifantasy-oraculo-web",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22.x" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.3.0"
+  }
+}

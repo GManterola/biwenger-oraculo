@@ -1,0 +1,15 @@
+{
+  "_ayuda": "Rellena estos campos y vuelve a generar la web (o espera a la ejecución diaria). Deja vacío lo que no tengas.",
+  "site_url": "https://bifantasy-oraculo.vercel.app",
+  "google_site_verification": "",
+  "x_handle": "",
+  "legal": {
+    "titular": "",
+    "nif": "",
+    "email": ""
+  },
+  "league": {
+    "code": "",
+    "url": ""
+  }
+}

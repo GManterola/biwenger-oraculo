@@ -305,3 +305,21 @@ table.pts tr.sel td { font-weight: 700; }
   .score-pick > span { display: none; }
   .score-pick select { max-width: 42vw; font-size: 13px; }
 }
+.match h2 { margin: 0 0 10px; font-size: 16px; }
+.match { margin-bottom: 12px; }
+.xi-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .xi-grid { grid-template-columns: 1fr 1fr; } }
+.xi h3 { margin: 0 0 6px; }
+.xi-line { font-size: 13px; padding: 3px 0; line-height: 1.6; }
+.xi-line .pos { margin-right: 6px; }
+.xi-line a { color: var(--text); font-weight: 600; }
+.xpost img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); display: block; margin: 8px 0; }
+.xpost textarea { font-size: 14px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.or-examples { margin: 10px 0; }
+.or-examples button { font-weight: 500; text-align: left; }
+.or-actions { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.check { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--text-2); }
+.answer { white-space: pre-wrap; line-height: 1.55; font-size: 15px; }
+.shot-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 0 0 12px; }
+.loading { color: var(--text-3); }

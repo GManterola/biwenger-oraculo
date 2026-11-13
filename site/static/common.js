@@ -196,15 +196,28 @@
     });
   }
 
+  // --- Compartir (menú nativo del móvil o copiar al portapapeles) ---
+  async function share({ title, text, url }) {
+    const full = url || location.href;
+    try {
+      if (navigator.share) { await navigator.share({ title, text, url: full }); return; }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    try { await navigator.clipboard.writeText(`${text}\n${full}`); toast("Copiado: pégalo donde quieras"); }
+    catch { prompt("Copia este texto:", `${text}\n${full}`); }
+    window.va?.("event", { name: "compartir" });
+  }
+
   const BF = window.BF = {
     data: null, store, $, $$, esc, norm, num, fmtM, fmtInc, pct, pctClass, parseM, STATUS, POS_ORDER,
     loadData, byId, getScore, setScore, sc, teamName, teamSlug, squad, toggleSquad, syncToggles, toast,
-    statusBadge, formBoxes, nextGame, rowHTML, attachSuggest,
+    statusBadge, formBoxes, nextGame, rowHTML, attachSuggest, share,
   };
 
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-toggle]");
-    if (t) { e.preventDefault(); toggleSquad(Number(t.dataset.toggle)); }
+    if (t) { e.preventDefault(); toggleSquad(Number(t.dataset.toggle)); return; }
+    const sh = e.target.closest("[data-share]");
+    if (sh) { e.preventDefault(); share({ title: document.title, text: sh.dataset.share }); }
   });
 
   document.addEventListener("DOMContentLoaded", () => {

@@ -14,10 +14,11 @@ con una captura de pantalla.
 - [x] Analizador de plantilla con alertas y once ideal (`/plantilla/`)
 - [x] Puja ideal (`/puja/`), consultorio automático (`/consultorio/`), saldos de rivales (`/rivales/`)
 - [x] SEO: títulos y descripciones, sitemap, robots, datos estructurados, imagen para redes
-- [ ] Liga Bifantasy: poner el código en `LEAGUE` de `site/build.py`
+- [x] Previa de jornada (`/jornada/`) y mejores por posición (`/mejores/...`)
+- [x] Posts diarios para X con imágenes (`/x/`, no indexada) y kit de lanzamiento (`marketing/`)
+- [x] Oráculo con IA (`/oraculo/`) y lectura de capturas en la plantilla: listos, se activan con `ANTHROPIC_API_KEY` en Vercel
+- [ ] Liga Bifantasy: poner el código en `site/config.json`
 - [ ] Calibrar el modelo con histórico y publicar su acierto
-- [ ] Cargar plantilla desde captura de pantalla
-- [ ] Oráculo en lenguaje natural
 - [ ] Otros juegos (LaLiga Fantasy/Mister, Futmondo, Comunio…) y competiciones
 - [ ] Cuenta de X
 
@@ -32,6 +33,25 @@ La URL pública se configura con `SITE_URL` (por defecto
 ```bash
 python site/build.py && python -m http.server -d web 8000
 ```
+
+## Configuración (`site/config.json`)
+
+URL pública, verificación de Google Search Console, usuario de X, datos del
+aviso legal y código de la liga. Cualquier cambio se aplica en la siguiente
+generación de la web.
+
+## Oráculo con IA
+
+Funciones de Vercel en `site/vercel/api/` (se copian a `web/api/`):
+`/api/oraculo` (preguntas) y `/api/captura` (leer una captura de la plantilla).
+Usan el SDK oficial `@anthropic-ai/sdk`. Para activarlas, en Vercel →
+Settings → Environment Variables:
+
+- `ANTHROPIC_API_KEY` (obligatoria)
+- `ORACULO_MODEL` (opcional, por defecto `claude-opus-5-5`; `claude-haiku-5-5` es mucho más barato)
+- `ORACULO_LIMIT_PER_HOUR` y `CAPTURA_LIMIT_PER_HOUR` (opcionales, límite por IP)
+
+Sin la clave, la web funciona igual y el oráculo muestra "se activará muy pronto".
 
 ## Datos
 

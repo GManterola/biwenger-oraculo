@@ -79,8 +79,15 @@
       ${missingTxt ? `<p class="hint">Te faltan jugadores para esta formación: ${esc(missingTxt)}.</p>` : ""}
       ${risky.length ? `<p class="hint">Ojo: ${risky.map((p) => esc(p.name)).join(", ")} ${risky.length > 1 ? "tienen" : "tiene"} menos de un 50 % de jugar y no tienes un sustituto mejor.</p>` : ""}
       <div class="pitch">${rowsPos}</div>
+      <p class="cta-row" style="margin-top:10px"><button class="btn" id="share-xi">Compartir mi once</button></p>
       ${bench.length ? `<p class="bench"><strong>Banquillo:</strong> ${bench.map((p) => `${esc(p.name)} (${pct(p.pPlay)})`).join(" · ")}</p>` : ""}
     </section>`;
+    $("#share-xi").addEventListener("click", () => {
+      const txt = `Mi once ideal (${lu.f}) según Bifantasy Oráculo, ${num(lu.total)} puntos esperados:\n` +
+        ["DEL", "MED", "DEF", "POR"].map((pos) => lu.picked[pos].map((p) => p.name).join(", ")).filter(Boolean).join("\n") +
+        "\n\nAnaliza el tuyo gratis:";
+      BF.share({ title: "Mi once ideal", text: txt, url: location.origin + "/plantilla/" });
+    });
     $("#formation").addEventListener("change", (e) => { formation = e.target.value; store.set("formation", formation); render(); });
 
     $("#squad-alerts").innerHTML = `<h2>Alertas</h2>` + (alerts.length
@@ -110,7 +117,40 @@
     render();
   }
 
+  async function shotUpload(file) {
+    const st = $("#shot-status");
+    if (!file) return;
+    st.textContent = "Leyendo la captura…";
+    try {
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+      c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+      const b64 = c.toDataURL("image/jpeg", 0.82).split(",")[1];
+      const res = await fetch("/api/captura", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: b64, media_type: "image/jpeg" }) });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && Array.isArray(data.names)) {
+        if (!data.names.length) { st.textContent = "No hemos encontrado jugadores en la imagen."; return; }
+        $("#paste-box").value = data.names.join("\n");
+        $(".paste").open = true;
+        pasteImport();
+        st.textContent = `Hemos leído ${data.names.length} nombres. Revisa abajo si falta alguno.`;
+        window.va?.("event", { name: "captura" });
+      } else if (data.error === "not_configured" || res.status === 404) {
+        st.textContent = "La lectura de capturas se activará muy pronto. De momento, pega la lista de nombres.";
+      } else {
+        st.textContent = data.message || "No hemos podido leer la captura.";
+      }
+    } catch {
+      st.textContent = "No hemos podido leer la imagen.";
+    } finally {
+      $("#shot-file").value = "";
+    }
+  }
+
   BF.loadData().then(() => {
+    $("#shot-file").addEventListener("change", (e) => shotUpload(e.target.files[0]));
     attachSuggest($("#squad-q"), $("#squad-suggest"), (p) => { if (!squad.has(p.id)) toggleSquad(p.id); },
       { right: (p) => squad.has(p.id) ? "✓ en plantilla" : fmtM(p.price) });
     $("#paste-go").addEventListener("click", pasteImport);

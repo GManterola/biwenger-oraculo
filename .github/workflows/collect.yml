@@ -27,6 +27,14 @@ jobs:
           done
       - name: Generar la web
         run: python site/build.py --competition la-liga
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Generar imágenes para X
+        run: |
+          npm install --no-save --no-package-lock playwright@1.63.0
+          npx playwright install --with-deps chromium
+          node site/scripts/render_cards.mjs
       - name: Guardar en el repositorio
         run: |
           git config user.name "github-actions[bot]"

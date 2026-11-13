@@ -7,6 +7,7 @@
 <meta name="description" content="Analiza tu plantilla de Biwenger gratis: probabilidad de jugar y de buen partido de cada jugador, alertas de lesiones y sanciones y el once ideal para la próxima jornada.">
 <link rel="canonical" href="https://bifantasy-oraculo.vercel.app/plantilla/">
 
+
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Bifantasy Oráculo">
 <meta property="og:title" content="Analizador de plantilla para Biwenger: % de jugar y once ideal">
@@ -36,7 +37,7 @@
       <select id="score-select" aria-label="Sistema de puntuación"><option value="1">Diario AS</option><option value="7">Feeberse Score</option><option value="8">Media AS y Feeberse</option><option value="2">SofaScore</option><option value="5">Media AS y SofaScore</option><option value="3">Estadísticas</option><option value="6">Biwenger Social</option></select>
     </label>
   </div>
-  <nav class="wrap nav" aria-label="Principal"><a href="/">Inicio</a><a href="/plantilla/" aria-current="page">Mi plantilla</a><a href="/jugadores/">Jugadores</a><a href="/mercado/">Mercado</a><a href="/bajas/">Bajas</a><a href="/puja/">Puja ideal</a><a href="/consultorio/">Consultorio</a><a href="/rivales/">Rivales</a></nav>
+  <nav class="wrap nav" aria-label="Principal"><a href="/">Inicio</a><a href="/jornada/">Jornada</a><a href="/plantilla/" aria-current="page">Mi plantilla</a><a href="/oraculo/">Oráculo</a><a href="/jugadores/">Jugadores</a><a href="/mercado/">Mercado</a><a href="/bajas/">Bajas</a><a href="/puja/">Puja ideal</a><a href="/consultorio/">Consultorio</a><a href="/rivales/">Rivales</a></nav>
 </header>
 <main id="main" class="wrap">
 
@@ -46,6 +47,8 @@
   <input id="squad-q" type="search" placeholder="Busca un jugador para añadirlo…" autocomplete="off" aria-label="Añadir jugador">
   <div id="squad-suggest" class="suggest" hidden></div>
 </div>
+<div class="shot-row"><label class="btn" for="shot-file">📷 Subir captura de mi plantilla</label>
+  <input id="shot-file" type="file" accept="image/*" hidden> <span id="shot-status" class="hint"></span></div>
 <details class="paste"><summary>Pegar una lista de nombres</summary>
   <p class="hint">Escribe o pega los nombres de tus jugadores, uno por línea o separados por comas.</p>
   <textarea id="paste-box" rows="5" placeholder="Raphinha&#10;Pedri&#10;Mbappé"></textarea>
@@ -67,7 +70,10 @@
       <p>Datos actualizados el 13 de noviembre. Las probabilidades son estimaciones, no garantías.</p>
     </div>
     <nav aria-label="Pie">
+      
       <a href="/metodologia/">Cómo calculamos</a>
+      <a href="/jornada/">Previa de la jornada</a>
+      <a href="/mejores/">Mejores por posición</a>
       <a href="/liga/">Liga Bifantasy</a>
       <a href="/equipos/">Equipos</a>
       <a href="/aviso-legal/">Aviso legal</a>

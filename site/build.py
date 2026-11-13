@@ -19,6 +19,8 @@ import html
 import json
 import os
 import shutil
+import textwrap
+from urllib.parse import quote
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -31,13 +33,14 @@ RAW_DIR = ROOT / "data" / "raw"
 STATIC_DIR = ROOT / "site" / "static"
 OUT = ROOT / "web"
 SITE_NAME = "Bifantasy Oráculo"
-DEFAULT_URL = os.environ.get("SITE_URL", "https://bifantasy-oraculo.vercel.app")
+CONFIG = json.loads((ROOT / "site" / "config.json").read_text(encoding="utf-8"))
+DEFAULT_URL = os.environ.get("SITE_URL") or CONFIG.get("site_url") or "https://bifantasy-oraculo.vercel.app"
+X_HANDLE = (CONFIG.get("x_handle") or "").lstrip("@")
 POSITIONS = {1: "POR", 2: "DEF", 3: "MED", 4: "DEL", 5: "ENT"}
 POS_NAME = {"POR": "Porteros", "DEF": "Defensas", "MED": "Centrocampistas", "DEL": "Delanteros", "ENT": "Entrenador"}
 PRIMARY_SCORE = 1
 HISTORY_DAYS = 60
-# Código de invitación de la liga oficial cuando exista (None = "próximamente").
-LEAGUE = {"code": None, "url": None}
+LEAGUE = CONFIG.get("league") or {}
 
 STATUS = {
     "ok": ("Disponible", "ok"),
@@ -166,7 +169,9 @@ LOGO = ('<svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16
 
 NAV = [
     ("/", "Inicio", "home"),
+    ("/jornada/", "Jornada", "round"),
     ("/plantilla/", "Mi plantilla", "squad"),
+    ("/oraculo/", "Oráculo", "oracle"),
     ("/jugadores/", "Jugadores", "players"),
     ("/mercado/", "Mercado", "market"),
     ("/bajas/", "Bajas", "injuries"),
@@ -191,6 +196,7 @@ def page(ctx: dict, *, path: str, title: str, description: str, body: str, activ
 <title>{e(full_title)}</title>
 <meta name="description" content="{e(description)}">
 <link rel="canonical" href="{e(url)}">
+{f'<meta name="google-site-verification" content="{e(CONFIG["google_site_verification"])}">' if CONFIG.get("google_site_verification") else ''}
 {'<meta name="robots" content="noindex">' if noindex else ''}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{SITE_NAME}">
@@ -235,7 +241,10 @@ def page(ctx: dict, *, path: str, title: str, description: str, body: str, activ
       <p>Datos actualizados el {fmt_day(ctx['data']['updated'])}. Las probabilidades son estimaciones, no garantías.</p>
     </div>
     <nav aria-label="Pie">
+      {f'<a href="https://x.com/{e(X_HANDLE)}" rel="me">Síguenos en X (@{e(X_HANDLE)})</a>' if X_HANDLE else ''}
       <a href="/metodologia/">Cómo calculamos</a>
+      <a href="/jornada/">Previa de la jornada</a>
+      <a href="/mejores/">Mejores por posición</a>
       <a href="/liga/">Liga Bifantasy</a>
       <a href="/equipos/">Equipos</a>
       <a href="/aviso-legal/">Aviso legal</a>
@@ -361,7 +370,7 @@ def p_home(ctx) -> str:
   <p class="lead">Probabilidad de jugar, probabilidad de buen partido, puja ideal y alertas de tu plantilla.
   Todo actualizado cada mañana y en el sistema de puntuación de tu liga.</p>
   <div class="cta"><a class="btn primary" href="/plantilla/">Analizar mi plantilla</a>
-  <a class="btn" href="/puja/">Calcular una puja</a></div>
+  <a class="btn" href="/jornada/">Ver la previa de la jornada</a></div>
   <p class="hint">No pedimos tu cuenta de Biwenger: añades tus jugadores y se guardan solo en tu navegador.</p>
 </section>
 
@@ -495,7 +504,8 @@ def p_player(ctx, p) -> str:
     <p class="sub2"><span class="pos">{p['pos']}</span>{(' / ' + ', '.join(p['alt'])) if p['alt'] else ''} · {team_link(ctx, p['team'])}</p>
     <p class="meta">{status_badge(p)} {('Próximo: ' + next_game(ctx, p, long=True)) if team.get('next') else ''}</p>
   </div>
-  <button class="btn primary" data-toggle="{p['id']}">Añadir a mi plantilla</button>
+  <div class="cta-row" style="margin:0"><button class="btn primary" data-toggle="{p['id']}">Añadir a mi plantilla</button>
+  <button class="btn" data-share="{e(p['name'])} en Biwenger: {pct(pp) + ' de jugar, ' if pp is not None else ''}{fmt_m(p['price'])}. Míralo en Bifantasy Oráculo:">Compartir</button></div>
 </div>
 {f'<div class="info"><strong>{e(STATUS.get(p["status"], ("",))[0])}:</strong> {e(p["info"])}</div>' if p.get('info') else ''}
 {probs}
@@ -567,6 +577,8 @@ def p_squad(ctx) -> str:
   <input id="squad-q" type="search" placeholder="Busca un jugador para añadirlo…" autocomplete="off" aria-label="Añadir jugador">
   <div id="squad-suggest" class="suggest" hidden></div>
 </div>
+<div class="shot-row"><label class="btn" for="shot-file">📷 Subir captura de mi plantilla</label>
+  <input id="shot-file" type="file" accept="image/*" hidden> <span id="shot-status" class="hint"></span></div>
 <details class="paste"><summary>Pegar una lista de nombres</summary>
   <p class="hint">Escribe o pega los nombres de tus jugadores, uno por línea o separados por comas.</p>
   <textarea id="paste-box" rows="5" placeholder="Raphinha&#10;Pedri&#10;Mbappé"></textarea>
@@ -632,6 +644,28 @@ def p_advisor(ctx) -> str:
                 body=body, active="advisor", scripts=("advisor.js",))
 
 
+def p_oracle(ctx) -> str:
+    examples = ["¿Pongo a Mbappé o a Vinícius esta jornada?", "¿Qué defensa barato ficho por menos de 3 M?",
+                "¿Vendo a algún jugador de mi plantilla?", "¿Quién es mejor capitán esta jornada?"]
+    chips = "".join(f'<button type="button" data-example="{e(x)}">{e(x)}</button>' for x in examples)
+    body = f"""
+<h1>Pregunta al oráculo</h1>
+<p class="lead small">Hazle cualquier duda de alineación, fichajes o pujas. Responde con los datos de hoy y, si quieres, teniendo en cuenta tu plantilla.</p>
+<form id="or-form" class="card">
+  <label for="or-q" class="sr">Tu pregunta</label>
+  <textarea id="or-q" rows="3" maxlength="500" placeholder="Ej. ¿Alineo a Lewandowski o a Raphinha?"></textarea>
+  <div class="chips or-examples">{chips}</div>
+  <div class="or-actions"><label class="check"><input type="checkbox" id="or-squad" checked> Tener en cuenta mi plantilla (<span id="or-count">0</span> jugadores)</label>
+  <button class="btn primary" type="submit" id="or-go">Preguntar</button></div>
+</form>
+<div id="or-answer" aria-live="polite"></div>
+<p class="hint">Respuestas generadas con IA a partir de nuestras estimaciones: pueden equivocarse. Tu pregunta y, si lo marcas, la lista de tu plantilla se envían para generar la respuesta; no guardamos nada más. ¿Prefieres reglas sin IA? Usa el <a href="/consultorio/">consultorio</a>.</p>
+"""
+    return page(ctx, path="/oraculo/", title="Oráculo fantasy: pregunta tus dudas de Biwenger",
+                description="Pregunta al oráculo de Bifantasy tus dudas de Biwenger: a quién alinear, qué fichar o cuánto pujar, con los datos de hoy y tu plantilla.",
+                body=body, active="oracle", scripts=("oracle.js",))
+
+
 def p_rivals(ctx) -> str:
     body = """
 <h1>Saldos de rivales</h1>
@@ -661,7 +695,8 @@ def p_league(ctx) -> str:
     if LEAGUE.get("code"):
         join = f'<p class="cta"><a class="btn primary" href="{e(LEAGUE["url"] or "#")}">Unirme a la liga</a></p><p>Código: <strong>{e(LEAGUE["code"])}</strong></p>'
     else:
-        join = '<div class="info">Muy pronto abriremos la liga. Síguenos en X para enterarte el primero.</div>'
+        follow = f' Síguenos en <a href="https://x.com/{e(X_HANDLE)}">@{e(X_HANDLE)}</a> para enterarte el primero.' if X_HANDLE else ""
+        join = f'<div class="info">Muy pronto abriremos la liga.{follow}</div>'
     body = f"""
 <h1>Liga Bifantasy</h1>
 <p class="lead small">Una liga abierta para competir con la comunidad de Bifantasy Oráculo durante la temporada.</p>
@@ -701,9 +736,15 @@ def p_method(ctx) -> str:
 
 
 def p_legal(ctx) -> str:
-    body = """
+    lg = CONFIG.get("legal") or {}
+    if lg.get("titular"):
+        titular = (f'<p><strong>Titular:</strong> {e(lg["titular"])}' + (f' · NIF {e(lg["nif"])}' if lg.get("nif") else "")
+                   + (f'<br><strong>Contacto:</strong> <a href="mailto:{e(lg["email"])}">{e(lg["email"])}</a>' if lg.get("email") else "") + "</p>")
+    else:
+        titular = "<p><strong>Titular:</strong> pendiente de completar.</p>"
+    body = f"""
 <h1>Aviso legal</h1>
-<p><strong>Titular:</strong> [pendiente de completar: nombre o razón social, NIF y email de contacto].</p>
+{titular}
 <p>Bifantasy Oráculo es una herramienta informativa, gratuita, independiente y no oficial. No está afiliada,
 patrocinada ni respaldada por Biwenger, LaLiga ni ningún club. Los nombres de competiciones, clubes y jugadores
 se usan solo para identificarlos.</p>
@@ -718,7 +759,8 @@ def p_privacy(ctx) -> str:
 <h1>Privacidad</h1>
 <ul>
 <li><strong>Sin cuentas:</strong> no pedimos registro ni acceso a tu cuenta de Biwenger.</li>
-<li><strong>Tus datos se quedan en tu navegador:</strong> la plantilla, los rivales y tus preferencias se guardan en el almacenamiento local de tu navegador y no se envían a ningún servidor.</li>
+<li><strong>Tus datos se quedan en tu navegador:</strong> la plantilla, los rivales y tus preferencias se guardan en el almacenamiento local de tu navegador. No se envían a ningún servidor salvo lo que tú decidas mandar al oráculo (ver abajo).</li>
+<li><strong>Oráculo y capturas:</strong> si usas el oráculo o subes una captura, la pregunta, la lista de tu plantilla o la imagen se envían a nuestro proveedor de IA (Anthropic) solo para generar la respuesta. No las guardamos.</li>
 <li><strong>Estadísticas anónimas:</strong> usamos Vercel Web Analytics para contar visitas de forma agregada, sin cookies y sin identificarte.</li>
 <li>Puedes borrar tus datos en cualquier momento borrando los datos del sitio en tu navegador.</li>
 </ul>
@@ -729,6 +771,225 @@ def p_privacy(ctx) -> str:
 def p_404(ctx) -> str:
     body = '<section class="hero"><h1>Página no encontrada</h1><p class="lead">Puede que el jugador haya cambiado de equipo o ya no esté en la competición.</p><p class="cta"><a class="btn primary" href="/jugadores/">Buscar jugador</a> <a class="btn" href="/">Ir al inicio</a></p></section>'
     return page(ctx, path="/404", title="Página no encontrada", description="Página no encontrada.", body=body, noindex=True)
+
+
+def matches(ctx) -> list[dict]:
+    d = ctx["data"]
+    out = []
+    for tid, t in d["teams"].items():
+        nx = t.get("next")
+        if nx and nx["home"]:
+            out.append({"home": tid, "away": nx["opp"], "date": nx.get("date"), "round": nx.get("round")})
+    return sorted(out, key=lambda m: m["date"] or 0)
+
+
+def probable_xi(ctx, tid) -> dict:
+    pl = [p for p in ctx["data"]["players"] if p["team"] == tid and p["pos"] != "ENT"]
+    need = {"POR": 1, "DEF": 4, "MED": 3, "DEL": 3}
+    xi = {}
+    for pos, n in need.items():
+        cands = sorted([p for p in pl if p["pos"] == pos],
+                       key=lambda p: (-(p.get("pPlay") or 0), -(p["scores"].get(ctx["ps"], {}).get("pts") or 0)))
+        xi[pos] = cands[:n]
+    return xi
+
+
+def p_round(ctx) -> str:
+    d, ps = ctx["data"], ctx["ps"]
+    nr = d["nextRound"]["name"] if d.get("nextRound") else "Próxima jornada"
+    pl = [p for p in d["players"] if p["pos"] != "ENT"]
+    captains = sorted(pl, key=lambda p: -(p["scores"].get(ps, {}).get("xp") or 0))[:6]
+    doubts = sorted([p for p in pl if p["status"] == "doubt"], key=lambda p: -(p["scores"].get(ps, {}).get("pts") or 0))[:6]
+    bargains = sorted([p for p in pl if p["scores"].get(ps, {}).get("vi") and p["played"] >= 4 and (p.get("pPlay") or 0) >= 0.6
+                       and p["scores"][ps]["xp"] >= 3.5], key=lambda p: -p["scores"][ps]["vi"])[:6]
+    cards = []
+    for m in matches(ctx):
+        cols = []
+        for tid in (m["home"], m["away"]):
+            t = d["teams"].get(tid, {})
+            xi = probable_xi(ctx, tid)
+            lines = "".join(
+                f'<div class="xi-line"><span class="pos">{pos}</span>' + ", ".join(
+                    f'<a href="/jugador/{e(p["slug"])}/">{e(p["name"])}</a> <span class="muted">{pct(p.get("pPlay"))}</span>' for p in xi[pos]) + "</div>"
+                for pos in ("POR", "DEF", "MED", "DEL"))
+            out = [p for p in pl if p["team"] == tid and p["status"] in ("injured", "sanctioned")]
+            dub = [p for p in pl if p["team"] == tid and p["status"] == "doubt"]
+            bajas = ", ".join(e(p["name"]) for p in sorted(out, key=lambda p: -(p["price"] or 0))[:8]) or "Ninguna"
+            dudas = ", ".join(f'{e(p["name"])} ({pct(p.get("pPlay"))})' for p in dub[:6])
+            cols.append(f'<div class="xi"><h3><a href="/equipo/{e(t.get("slug", ""))}/">{e(t.get("name", "?"))}</a></h3>{lines}'
+                        f'<p class="hint"><strong>Bajas:</strong> {bajas}{("<br><strong>Dudas:</strong> " + dudas) if dudas else ""}</p></div>')
+        home, away = d["teams"].get(m["home"], {}), d["teams"].get(m["away"], {})
+        cards.append(f'<section class="match card"><h2>{e(home.get("name", "?"))} – {e(away.get("name", "?"))}'
+                     f'<span class="muted"> · {e(fmt_ts(m["date"]))}</span></h2><div class="xi-grid">{"".join(cols)}</div></section>')
+    body = f"""
+<h1>Previa de la {e(nr)}: onces probables, bajas y capitanes</h1>
+<p class="lead small">Todo lo que necesitas para cerrar tu alineación de Biwenger antes de la {e(nr)}. Onces probables según nuestra probabilidad de jugar. Actualizado el {fmt_day(d['updated'])}.</p>
+<nav class="toc"><a href="#capitanes">Capitanes</a><a href="#chollos">Chollos</a><a href="#dudas">Dudas</a><a href="#partidos">Partidos</a></nav>
+<h2 id="capitanes">Mejores opciones de la jornada</h2>
+<p class="hint">Los jugadores con más puntos esperados ({e(ctx['ps_name'])}).</p>
+<div class="list">{''.join(player_row(ctx, p) for p in captains)}</div>
+<h2 id="chollos">Chollos para esta jornada</h2>
+<div class="list">{''.join(player_row(ctx, p) for p in bargains)}</div>
+<h2 id="dudas">Dudas que deciden alineaciones</h2>
+<div class="list">{''.join(player_row(ctx, p, f'<p class="row-info">{e(p["info"])}</p>' if p.get("info") else "") for p in doubts)}</div>
+<h2 id="partidos">Partido a partido</h2>
+{''.join(cards)}
+<p class="hint">Once probable = los jugadores con más probabilidad de jugar en cada posición (1-4-3-3). No es la alineación confirmada. <a href="/metodologia/">Cómo lo calculamos</a>.</p>
+"""
+    return page(ctx, path="/jornada/", title=f"Previa {nr} Biwenger: onces probables, bajas y capitanes",
+                description=f"Previa de la {nr} de LaLiga para Biwenger: onces probables, lesionados y dudas de cada partido, mejores capitanes y chollos. Actualizado el {fmt_day(d['updated'])}.",
+                body=body, active="round")
+
+
+BEST = {"porteros": "POR", "defensas": "DEF", "centrocampistas": "MED", "delanteros": "DEL"}
+
+
+def p_best(ctx, slug, pos) -> str:
+    d, ps = ctx["data"], ctx["ps"]
+    pl = [p for p in d["players"] if p["pos"] == pos and p["status"] not in ("injured", "sanctioned", "discarded")]
+    name = POS_NAME[pos].lower()
+    top = sorted(pl, key=lambda p: -(p["scores"].get(ps, {}).get("xp") or 0))[:15]
+    cheap = sorted([p for p in pl if (p["price"] or 0) <= 3e6 and p["played"] >= 3],
+                   key=lambda p: -(p["scores"].get(ps, {}).get("xp") or 0))[:15]
+    value = sorted([p for p in pl if p["scores"].get(ps, {}).get("vi") and p["played"] >= 4 and (p.get("pPlay") or 0) >= 0.6],
+                   key=lambda p: -p["scores"][ps]["vi"])[:15]
+    others = " · ".join(f'<a href="/mejores/{k}/">{POS_NAME[v]}</a>' for k, v in BEST.items() if k != slug)
+    body = f"""
+<nav class="crumbs"><a href="/">Inicio</a> › <a href="/mejores/">Mejores</a> › <span>{POS_NAME[pos]}</span></nav>
+<h1>Mejores {name} de Biwenger para la {e(d['nextRound']['name'] if d.get('nextRound') else 'próxima jornada')}</h1>
+<p class="lead small">Los {name} con más puntos esperados, los mejores baratos (3 M o menos) y los de mejor relación puntos/precio. Puntos según {e(ctx['ps_name'])}. Actualizado el {fmt_day(d['updated'])}.</p>
+<nav class="toc"><a href="#top">Más puntos esperados</a><a href="#baratos">Baratos</a><a href="#valor">Mejor valor</a></nav>
+<h2 id="top">Más puntos esperados</h2><div class="list">{''.join(player_row(ctx, p) for p in top)}</div>
+<h2 id="baratos">Mejores {name} baratos (≤ 3 M)</h2><div class="list">{''.join(player_row(ctx, p) for p in cheap) or '<p class="empty">Ninguno</p>'}</div>
+<h2 id="valor">Mejor relación puntos/precio</h2><div class="list">{''.join(player_row(ctx, p) for p in value)}</div>
+<p class="hint">Ver también: {others}</p>
+"""
+    return page(ctx, path=f"/mejores/{slug}/", title=f"Mejores {name} de Biwenger: baratos y chollos esta jornada",
+                description=f"Los mejores {name} de Biwenger esta jornada: más puntos esperados, baratos de 3 M o menos y chollos por relación puntos/precio. Actualizado el {fmt_day(d['updated'])}.",
+                body=body, active="players")
+
+
+def p_best_index(ctx) -> str:
+    items = "".join(f'<a class="team-card" href="/mejores/{k}/"><strong>Mejores {POS_NAME[v].lower()}</strong><span class="muted">top, baratos y chollos</span></a>' for k, v in BEST.items())
+    body = f'<h1>Mejores jugadores por posición</h1><p class="lead small">Los mejores de cada posición para la próxima jornada de Biwenger.</p><div class="team-grid">{items}</div>'
+    return page(ctx, path="/mejores/", title="Mejores jugadores de Biwenger por posición", body=body, active="players",
+                description="Mejores porteros, defensas, centrocampistas y delanteros de Biwenger: más puntos esperados, baratos y chollos.")
+
+
+# ---------------------------------------------------------------- posts para X
+
+CARD_CSS = """*{box-sizing:border-box}body{margin:0;width:1200px;height:675px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+background:linear-gradient(135deg,#0f3d75,#1f6fd1);color:#fff;padding:48px 64px;display:flex;flex-direction:column}
+.hd{display:flex;align-items:center;gap:14px;font-size:26px;opacity:.95}.hd b{font-weight:800}
+h1{font-size:50px;line-height:1.05;margin:22px 0 22px;letter-spacing:-1px}
+.rows{display:flex;flex-direction:column;gap:10px;flex:1}
+.r{display:grid;grid-template-columns:1fr auto;align-items:center;background:rgba(255,255,255,.1);border-radius:14px;padding:12px 20px;font-size:28px}
+.r small{display:block;font-size:19px;opacity:.75}.v{font-weight:800;font-variant-numeric:tabular-nums}
+.up{color:#9ff59f}.down{color:#ffb3b3}.ft{display:flex;justify-content:space-between;font-size:21px;opacity:.85;margin-top:18px}
+.big{font-size:120px;font-weight:900;line-height:1;margin:6px 0}.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;flex:1}
+.box{background:rgba(255,255,255,.1);border-radius:18px;padding:22px 26px;font-size:24px}.box h2{margin:0 0 6px;font-size:34px}"""
+
+CARD_HOST = ["bifantasy-oraculo.vercel.app"]
+LOGO_W = LOGO.replace('class="logo"', 'width="40" height="40" style="color:#fff"')
+
+
+def card(title: str, inner: str, foot: str) -> str:
+    return (f'<!doctype html><html lang="es"><head><meta charset="utf-8"><style>{CARD_CSS}</style></head><body>'
+            f'<div class="hd">{LOGO_W}<span><b>Bifantasy</b> Oráculo</span></div><h1>{e(title)}</h1>{inner}'
+            f'<div class="ft"><span>{e(foot)}</span><span>{e(CARD_HOST[0])}</span></div></body></html>')
+
+
+def x_posts(ctx) -> list[dict]:
+    d, ps, url = ctx["data"], ctx["ps"], ctx["url"]
+    pl = [p for p in d["players"] if p["pos"] != "ENT"]
+    tname = lambda p: d["teams"].get(p["team"], {}).get("name", "")  # noqa: E731
+    day = fmt_day(d["updated"])
+    nr = d["nextRound"]["name"] if d.get("nextRound") else "la jornada"
+    posts = []
+
+    ups = [p for p in sorted(pl, key=lambda p: -(p["inc"] or 0)) if (p["inc"] or 0) > 0][:5]
+    downs = [p for p in sorted(pl, key=lambda p: (p["inc"] or 0)) if (p["inc"] or 0) < 0][:3]
+    if ups:
+        lines = "\n".join(f"📈 {p['name']} {fmt_inc(p['inc'])[0].replace('▲ ', '')}" for p in ups[:3])
+        lines += "\n" + "\n".join(f"📉 {p['name']} {fmt_inc(p['inc'])[0].replace('▼ ', '')}" for p in downs[:2])
+        rows = "".join(f'<div class="r"><span>{e(p["name"])}<small>{e(tname(p))} · {fmt_m(p["price"])}</small></span>'
+                       f'<span class="v {"up" if p["inc"] > 0 else "down"}">{e(fmt_inc(p["inc"])[0])}</span></div>' for p in ups[:3] + downs[:2])
+        posts.append({"id": "mercado", "title": "Mercado del día",
+                      "text": f"Mercado de #Biwenger hoy ({day}):\n\n{lines}\n\nTodas las subidas, bajadas y chollos 👇\n{url}/mercado/",
+                      "card": card(f"Mercado · {day}", f'<div class="rows">{rows}</div>', "Subidas y bajadas de precio")})
+
+    cutoff = dt.datetime.fromisoformat(d["updated"] + "T00:00:00+00:00").timestamp() - 36 * 3600
+    news = sorted([p for p in pl if p["status"] in ("injured", "sanctioned", "doubt") and (p.get("since") or 0) >= cutoff],
+                  key=lambda p: -(p["price"] or 0))[:5]
+    if news:
+        lab = {"injured": "🚑", "sanctioned": "🟥", "doubt": "❓"}
+        lines = "\n".join(f"{lab[p['status']]} {p['name']} ({tname(p)})" for p in news[:4])
+        rows = "".join(f'<div class="r"><span>{e(p["name"])}<small>{e(tname(p))} · {e(textwrap.shorten(p.get("info") or STATUS[p["status"]][0], 72, placeholder="…"))}</small></span>'
+                       f'<span class="v">{e(STATUS[p["status"]][0])}</span></div>' for p in news[:5])
+        posts.append({"id": "bajas", "title": "Novedades de bajas",
+                      "text": f"Novedades en la enfermería para la {nr} de #Biwenger:\n\n{lines}\n\nTodas las bajas y dudas, con fecha de vuelta 👇\n{url}/bajas/",
+                      "card": card(f"Novedades de bajas · {nr}", f'<div class="rows">{rows}</div>', "Lesiones, sanciones y dudas")})
+
+    bargains = sorted([p for p in pl if p["scores"].get(ps, {}).get("vi") and p["played"] >= 4 and (p.get("pPlay") or 0) >= 0.6
+                       and p["scores"][ps]["xp"] >= 3.5], key=lambda p: -p["scores"][ps]["vi"])
+    if bargains:
+        b = bargains[(dt.date.fromisoformat(d["updated"]).toordinal()) % min(5, len(bargains))]
+        sb = b["scores"][ps]
+        inner = (f'<div class="two"><div class="box"><h2>{e(b["name"])}</h2>{e(tname(b))} · {b["pos"]}<div class="big">{fmt_m(b["price"])}</div></div>'
+                 f'<div class="box"><div>Probabilidad de jugar</div><div class="big" style="font-size:90px">{pct(b["pPlay"])}</div>'
+                 f'<div>{str(sb["xp"]).replace(".", ",")} puntos esperados · media {str(sb["avg"]).replace(".", ",")}</div></div></div>')
+        posts.append({"id": "chollo", "title": "Chollo del día",
+                      "text": (f"💰 Chollo del día en #Biwenger: {b['name']} ({tname(b)})\n\n"
+                               f"Precio: {fmt_m(b['price'])}\n% de jugar: {pct(b['pPlay'])}\nPuntos esperados: {str(sb['xp']).replace('.', ',')}\n\n"
+                               f"¿Cuánto pujar por él? 👇\n{url}/puja/?p={b['id']}"),
+                      "card": card("Chollo del día", inner, f"Puntos según {ctx['ps_name']}")})
+
+    top = sorted([p for p in pl if (p.get("pPlay") or 0) >= 0.7], key=lambda p: -(p["scores"].get(ps, {}).get("xp") or 0))[:12]
+    pair = next(((a, c) for i, a in enumerate(top) for c in top[i + 1:] if a["pos"] == c["pos"] and abs((a["price"] or 0) - (c["price"] or 0)) < 4e6), None)
+    if pair:
+        a, c = pair
+        box = lambda p: (f'<div class="box"><h2>{e(p["name"])}</h2>{e(tname(p))} · {fmt_m(p["price"])}'  # noqa: E731
+                         f'<div class="big" style="font-size:84px">{str(p["scores"][ps]["xp"]).replace(".", ",")}</div>puntos esperados · {pct(p["pPlay"])} juega</div>')
+        win = a if a["scores"][ps]["xp"] >= c["scores"][ps]["xp"] else c
+        posts.append({"id": "aob", "title": "¿A o B?",
+                      "text": (f"¿A o B para la {nr}? 🤔\n\n🅰️ {a['name']} ({tname(a)})\n🅱️ {c['name']} ({tname(c)})\n\n"
+                               f"Vota y te decimos qué dice el oráculo en las respuestas. Compara tus dudas aquí 👇\n{url}/consultorio/?a={a['id']}&b={c['id']}"),
+                      "reply": f"El oráculo se queda con {win['name']}: {str(win['scores'][ps]['xp']).replace('.', ',')} puntos esperados y {pct(win['pPlay'])} de jugar.",
+                      "card": card(f"¿A o B? · {nr}", f'<div class="two">{box(a)}{box(c)}</div>', "Vota en las respuestas")})
+
+    captains = sorted(pl, key=lambda p: -(p["scores"].get(ps, {}).get("xp") or 0))[:5]
+    games = [t.get("next", {}).get("date") for t in d["teams"].values() if t.get("next")]
+    first = min((g for g in games if g), default=None)
+    if first and 0 <= (first - dt.datetime.fromisoformat(d["updated"] + "T06:00:00+00:00").timestamp()) / 86400 <= 3:
+        rows = "".join(f'<div class="r"><span>{e(p["name"])}<small>{e(tname(p))} · {pct(p["pPlay"])} juega</small></span>'
+                       f'<span class="v">{str(p["scores"][ps]["xp"]).replace(".", ",")} pts</span></div>' for p in captains)
+        posts.append({"id": "jornada", "title": "Previa de la jornada",
+                      "text": (f"🔮 Previa de la {nr} de #Biwenger\n\nLos que más puntos esperamos:\n"
+                               + "\n".join(f"{i + 1}. {p['name']}" for i, p in enumerate(captains[:3]))
+                               + f"\n\nOnces probables, bajas y chollos de cada partido 👇\n{url}/jornada/"),
+                      "card": card(f"Previa · {nr}", f'<div class="rows">{rows}</div>', "Más puntos esperados")})
+    return posts
+
+
+def p_x(ctx, posts) -> str:
+    items = []
+    for p in posts:
+        intent = "https://x.com/intent/post?text=" + quote(p["text"])
+        reply = f'<p class="hint"><strong>Respuesta para publicar después:</strong> {e(p["reply"])}</p>' if p.get("reply") else ""
+        items.append(f"""<section class="card xpost" id="{p['id']}">
+  <h2>{e(p['title'])} <span class="muted">· {len(p['text'])} caracteres</span></h2>
+  <img src="/x/{p['id']}.jpg?v={ctx['ver']}" alt="Imagen para el post {e(p['title'])}" loading="lazy" width="1200" height="675">
+  <textarea readonly rows="8">{e(p['text'])}</textarea>{reply}
+  <p class="cta-row"><button class="btn primary" data-copy>Copiar texto</button>
+  <a class="btn" href="/x/{p['id']}.jpg?v={ctx['ver']}" download="bifantasy-{p['id']}-{ctx['data']['updated']}.jpg">Descargar imagen</a>
+  <a class="btn" href="{e(intent)}" target="_blank" rel="noopener">Abrir en X</a></p>
+</section>""")
+    body = f"""<h1>Posts para X · {fmt_day(ctx['data']['updated'])}</h1>
+<p class="lead small">Página interna (no aparece en Google). Cada mañana se generan aquí los posts del día: descarga la imagen, copia el texto y publícalo. "Abrir en X" rellena el texto, pero la imagen hay que adjuntarla a mano.</p>
+{''.join(items) or '<p class="empty">Hoy no hay posts.</p>'}
+<script>document.addEventListener("click",function(e){{var b=e.target.closest("[data-copy]");if(!b)return;var t=b.closest(".xpost").querySelector("textarea");t.select();
+try{{navigator.clipboard.writeText(t.value);}}catch(_){{document.execCommand("copy");}}b.textContent="¡Copiado!";setTimeout(function(){{b.textContent="Copiar texto";}},1800);}});</script>"""
+    return page(ctx, path="/x/", title="Posts para X", description="Posts del día para X.", body=body, noindex=True)
 
 
 # ---------------------------------------------------------------- build
@@ -760,6 +1021,7 @@ def main() -> int:
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True)
     shutil.copytree(STATIC_DIR, OUT, dirs_exist_ok=True)
+    shutil.copytree(ROOT / "site" / "vercel", OUT, dirs_exist_ok=True)
     (OUT / "data").mkdir()
     (OUT / "data" / f"{args.competition}.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
 
@@ -768,7 +1030,10 @@ def main() -> int:
         "/plantilla/": p_squad(ctx), "/puja/": p_bid(ctx), "/consultorio/": p_advisor(ctx), "/rivales/": p_rivals(ctx),
         "/liga/": p_league(ctx), "/metodologia/": p_method(ctx), "/equipos/": p_teams(ctx),
         "/aviso-legal/": p_legal(ctx), "/privacidad/": p_privacy(ctx),
+        "/jornada/": p_round(ctx), "/oraculo/": p_oracle(ctx), "/mejores/": p_best_index(ctx),
     }
+    for slug, pos in BEST.items():
+        pages[f"/mejores/{slug}/"] = p_best(ctx, slug, pos)
     for tid, t in data["teams"].items():
         pages[f"/equipo/{t['slug']}/"] = p_team(ctx, tid, t)
     for p in data["players"]:
@@ -776,6 +1041,17 @@ def main() -> int:
     for rel, content in pages.items():
         write(rel, content)
     (OUT / "404.html").write_text(p_404(ctx), encoding="utf-8")
+
+    CARD_HOST[0] = ctx["url"].split("://", 1)[-1]
+    posts = x_posts(ctx)
+    write("/x/", p_x(ctx, posts))
+    cards_dir = ROOT / "build" / "cards"
+    if cards_dir.exists():
+        shutil.rmtree(cards_dir)
+    cards_dir.mkdir(parents=True)
+    for p in posts:
+        (cards_dir / f"{p['id']}.html").write_text(p["card"], encoding="utf-8")
+    (OUT / "x" / "posts.json").write_text(json.dumps([{k: v for k, v in p.items() if k != "card"} for p in posts], ensure_ascii=False, indent=1))
 
     lastmod = data["updated"]
     urls = "".join(f"<url><loc>{e(ctx['url'] + rel)}</loc><lastmod>{lastmod}</lastmod></url>" for rel in pages)

@@ -1,0 +1,23 @@
+[
+ {
+  "id": "mercado",
+  "title": "Mercado del día",
+  "text": "Mercado de #Biwenger hoy (13 de noviembre):\n\n📈 Aubameyang +190 k\n📈 Fermín +190 k\n📈 Diomande +190 k\n📉 Barrenetxea −220 k\n📉 Rodri −190 k\n\nTodas las subidas, bajadas y chollos 👇\nhttps://bifantasy-oraculo.vercel.app/mercado/"
+ },
+ {
+  "id": "bajas",
+  "title": "Novedades de bajas",
+  "text": "Novedades en la enfermería para la Jornada 13 de #Biwenger:\n\n❓ Mbappé (Real Madrid)\n❓ Ilaix Moriba (Celta)\n❓ Sadiq (Valencia)\n🚑 Aitor Fernández (Osasuna)\n\nTodas las bajas y dudas, con fecha de vuelta 👇\nhttps://bifantasy-oraculo.vercel.app/bajas/"
+ },
+ {
+  "id": "chollo",
+  "title": "Chollo del día",
+  "text": "💰 Chollo del día en #Biwenger: Ejuke (Sevilla)\n\nPrecio: 2,24 M\n% de jugar: 84 %\nPuntos esperados: 5,04\n\n¿Cuánto pujar por él? 👇\nhttps://bifantasy-oraculo.vercel.app/puja/?p=33531"
+ },
+ {
+  "id": "aob",
+  "title": "¿A o B?",
+  "text": "¿A o B para la Jornada 13? 🤔\n\n🅰️ Raphinha (Barcelona)\n🅱️ Yamal (Barcelona)\n\nVota y te decimos qué dice el oráculo en las respuestas. Compara tus dudas aquí 👇\nhttps://bifantasy-oraculo.vercel.app/consultorio/?a=26930&b=26271",
+  "reply": "El oráculo se queda con Raphinha: 10,56 puntos esperados y 94 % de jugar."
+ }
+]

@@ -2,3 +2,5 @@ data/biwenger.db
 __pycache__/
 *.pyc
 .env
+build/
+node_modules/
